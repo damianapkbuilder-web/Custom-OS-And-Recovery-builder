@@ -1,0 +1,6 @@
+{
+  "name": "Recovery & ROM Studio",
+  "description": "Build, downgrade, patch, and repack flashable recoveries and custom OSes for legacy and unsupported devices without unlocking bootloader or root.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
