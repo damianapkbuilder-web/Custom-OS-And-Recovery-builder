@@ -148,6 +148,7 @@ fun BuilderScreen(
                             onToggleForceDexPreopt = { en -> viewModel.toggleForceDexPreopt(en) },
                             onToggleAppOpsPrivacy = { en -> viewModel.toggleAppOpsPrivacy(en) },
                             onToggleDalvikHeap = { en -> viewModel.toggleDalvikHeapOptimizer(en) },
+                            onApplyHeaviestPreset = { viewModel.configureHeaviestPreset() },
                             onPrevious = { viewModel.previousWizardStep() },
                             onNext = { viewModel.nextWizardStep() },
                             modifier = Modifier.fillMaxSize()
@@ -166,6 +167,7 @@ fun BuilderScreen(
                             isWifiRequirementMet = batteryState.isWifiRequirementMet,
                             isWifiSimulated = batteryState.isWifiSimulated,
                             onToggleWifiSimulation = { en -> viewModel.toggleWifiSimulation(en) },
+                            onApplyHeaviestPreset = { viewModel.configureHeaviestPreset() },
                             onStartBuild = { viewModel.startFirmwareBuildService() },
                             onCancelBuild = { viewModel.cancelFirmwareBuildService() },
                             onResetBuild = { viewModel.resetBuildState() },

@@ -82,6 +82,7 @@ fun AdditionalFeaturesStep(
     onToggleForceDexPreopt: (Boolean) -> Unit = {},
     onToggleAppOpsPrivacy: (Boolean) -> Unit = {},
     onToggleDalvikHeap: (Boolean) -> Unit = {},
+    onApplyHeaviestPreset: (() -> Unit)? = null,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     modifier: Modifier = Modifier
@@ -115,19 +116,43 @@ fun AdditionalFeaturesStep(
                 .padding(14.dp)
         ) {
             Column {
-                Text(
-                    text = "STEP 5: ADDITIONAL FEATURES & ZIP MODS",
-                    color = HoloBlueLight,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = "Select root solutions (Kitsune, Magisk Alpha, KernelSU, APatch, SuperSU, or All-in-One), audio/system mods, and search web for latest releases.",
-                    color = colors.textSecondary,
-                    fontSize = 12.sp
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "STEP 5: ADDITIONAL FEATURES & ZIP MODS",
+                            color = HoloBlueLight,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.5.sp
+                        )
+                        Spacer(modifier = Modifier.height(3.dp))
+                        Text(
+                            text = "Select root solutions (Kitsune, Magisk Alpha, KernelSU, APatch, SuperSU, or All-in-One), audio/system mods, and search web for latest releases.",
+                            color = colors.textSecondary,
+                            fontSize = 12.sp
+                        )
+                    }
+
+                    if (onApplyHeaviestPreset != null) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = onApplyHeaviestPreset,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFB71C1C),
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(3.dp),
+                            modifier = Modifier.testTag("features_heaviest_preset_btn")
+                        ) {
+                            Text("HEAVIEST PRESET", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // Web Search Bar

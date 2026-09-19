@@ -114,7 +114,8 @@ fun MainAppContent(viewModel: MainViewModel) {
                 },
                 isWifiConnected = batteryState.isWifiRequirementMet,
                 isWifiSimulated = batteryState.isWifiSimulated,
-                onToggleWifiSimulation = { viewModel.toggleWifiSimulation(it) }
+                onToggleWifiSimulation = { viewModel.toggleWifiSimulation(it) },
+                onApplyHeaviestPreset = { viewModel.configureHeaviestPreset() }
             )
         },
         bottomBar = {

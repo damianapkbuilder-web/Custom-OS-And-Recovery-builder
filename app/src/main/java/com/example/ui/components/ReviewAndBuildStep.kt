@@ -67,6 +67,7 @@ fun ReviewAndBuildStep(
     isWifiRequirementMet: Boolean = true,
     isWifiSimulated: Boolean = false,
     onToggleWifiSimulation: (Boolean) -> Unit = {},
+    onApplyHeaviestPreset: (() -> Unit)? = null,
     onStartBuild: () -> Unit,
     onCancelBuild: () -> Unit,
     onResetBuild: () -> Unit,
@@ -96,20 +97,41 @@ fun ReviewAndBuildStep(
                 .background(colors.surface)
                 .padding(14.dp)
         ) {
-            Column {
-                Text(
-                    text = "STEP 6: REVIEW & FLASHABLE SERVICE",
-                    color = HoloBlueLight,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
-                )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = "Verify selections, network prerequisites, and launch background download, extraction, modification, and repackaging service.",
-                    color = colors.textSecondary,
-                    fontSize = 12.sp
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "STEP 6: REVIEW & FLASHABLE SERVICE",
+                        color = HoloBlueLight,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.5.sp
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(
+                        text = "Verify selections, network prerequisites, and launch background download, extraction, modification, and repackaging service.",
+                        color = colors.textSecondary,
+                        fontSize = 12.sp
+                    )
+                }
+
+                if (onApplyHeaviestPreset != null && !isBuilding) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onApplyHeaviestPreset,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFB71C1C),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(3.dp),
+                        modifier = Modifier.testTag("heaviest_zip_preset_btn")
+                    ) {
+                        Text("HEAVIEST ZIP PRESET", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
 

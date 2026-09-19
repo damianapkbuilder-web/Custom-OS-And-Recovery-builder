@@ -88,13 +88,17 @@ class ZipPatcherEngine(private val context: Context) {
                 ?: File("/storage/emulated/0/Download").apply { mkdirs() }
         }
 
+        val sanitizedDeviceCodename = config.device.codename.replace(Regex("[^a-zA-Z0-9._-]"), "_").replace(Regex("_+"), "_").trim('_')
+        val sanitizedOs = osName.replace(Regex("[^a-zA-Z0-9._-]"), "_").replace(Regex("_+"), "_").trim('_')
+        val sanitizedRec = recoveryName.replace(Regex("[^a-zA-Z0-9._-]"), "_").replace(Regex("_+"), "_").trim('_')
+
         val baseDir = File(context.cacheDir, "workspace_$buildUuid")
         if (baseDir.exists()) baseDir.deleteRecursively()
         baseDir.mkdirs()
 
         val downloadDir = File(baseDir, "download").apply { mkdirs() }
         // Local device extraction target in /storage/emulated/0/Download/
-        val extractDirName = "extracted_${config.device.codename}_${buildUuid.take(6)}"
+        val extractDirName = "extracted_${sanitizedDeviceCodename}_${buildUuid.take(6)}"
         val deviceExtractDir = File(storageDownloadsDir, extractDirName).apply { mkdirs() }
         val extractDir = if (deviceExtractDir.exists() && deviceExtractDir.canWrite()) {
             deviceExtractDir
@@ -111,19 +115,17 @@ class ZipPatcherEngine(private val context: Context) {
         emitLog("[NET:DOWNLOAD] Source Device Architecture: ${config.device.name} [Codename: ${config.device.codename} | ${config.device.nativeArch}]")
         delay(250)
 
-        val sanitizedOs = osName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
-        val sanitizedRec = recoveryName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
-        val romFileName = "${sanitizedOs}_${config.device.codename}_source.zip"
-        val recFileName = "${sanitizedRec}_${config.device.codename}_recovery.zip"
+        val romFileName = "${sanitizedOs}_${sanitizedDeviceCodename}_source.zip"
+        val recFileName = "${sanitizedRec}_${sanitizedDeviceCodename}_recovery.zip"
 
-        emitLog("[NET:DOWNLOAD] HTTP/2 GET https://mirrors.androidstud.io/devices/${config.device.codename}/roms/$romFileName")
+        emitLog("[NET:DOWNLOAD] HTTP/2 GET https://mirrors.androidstud.io/devices/$sanitizedDeviceCodename/roms/$romFileName")
         emitLog("[NET:DOWNLOAD] HTTP/2 200 OK | Remote Payload: 684,281,920 bytes | Content-Type: application/zip")
         delay(200)
         onProgress(0.12f, "Streaming ${config.device.name} ROM package blocks (24.8 MB/s)...")
         emitLog("[NET:DOWNLOAD] Transferred 340 MB / 684 MB -> SHA-256 integrity verified")
         delay(200)
         onProgress(0.18f, "Downloading recovery package ($recFileName)...")
-        emitLog("[NET:DOWNLOAD] HTTP/2 GET https://mirrors.androidstud.io/devices/${config.device.codename}/recoveries/$recFileName")
+        emitLog("[NET:DOWNLOAD] HTTP/2 GET https://mirrors.androidstud.io/devices/$sanitizedDeviceCodename/recoveries/$recFileName")
         emitLog("[NET:DOWNLOAD] HTTP/2 200 OK | Content-Length: 42,991,616 bytes | Cryptographic signature confirmed")
         delay(180)
 
@@ -159,12 +161,13 @@ class ZipPatcherEngine(private val context: Context) {
             HoloThemeMode.HOLO_LIGHT -> "HoloLight"
             HoloThemeMode.HOLO_LIGHT_DARK_ACTIONBAR -> "HoloLightDarkActionBar"
         }
-        val magiskSuffix = if (magiskOpt != MagiskOption.NONE) "_${magiskOpt.versionTag}" else ""
-        val finalZipName = "${sanitizedOs}_${sanitizedRec}_${config.device.codename}_${guiSuffix}${magiskSuffix}_flashable.zip"
+        val magiskSuffix = if (magiskOpt != MagiskOption.NONE) "_${magiskOpt.versionTag.replace(Regex("[^a-zA-Z0-9._-]"), "_")}" else ""
+        val finalZipName = "${sanitizedOs}_${sanitizedRec}_${sanitizedDeviceCodename}_${guiSuffix}${magiskSuffix}_flashable.zip"
         val finalZipFile = File(outputDir, finalZipName)
         if (finalZipFile.exists()) finalZipFile.delete()
 
         // Also output directly into user's public Downloads directory
+        storageDownloadsDir.mkdirs()
         val publicZipFile = File(storageDownloadsDir, finalZipName)
 
         onProgress(0.80f, "Repackaging into flashable ZIP ($finalZipName)...")

@@ -15,6 +15,8 @@ import com.example.data.model.DeviceModel
 import com.example.data.model.DeviceRepository
 import com.example.data.model.MagiskCustomization
 import com.example.data.model.MagiskOption
+import com.example.data.model.MagiskPatchMode
+import com.example.data.model.MagiskRootAccess
 import com.example.data.model.OsModel
 import com.example.data.model.OsRepository
 import com.example.data.model.RecoveryModel
@@ -338,6 +340,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun resetBuildState() {
         FirmwareBuildService.clearResult()
+    }
+
+    /**
+     * Heavy Preset: Selects OrangeFox, Xiaomi HyperOS Latest, All-in-One Multi-Root, and all additional feature mods
+     */
+    fun configureHeaviestPreset() {
+        val orangeFox = RecoveryRepository.recoveries.find { it.id == "orangefox" } ?: RecoveryRepository.recoveries[0]
+        val hyperOs = OsRepository.operatingSystems.find { it.id == "miui_eu" } ?: OsRepository.operatingSystems[0]
+        val latestVersion = hyperOs.defaultVersions.lastOrNull() ?: "Xiaomi HyperOS 1.0 EU"
+
+        val heavyFeatures = _buildConfig.value.additionalFeatures.copy(
+            magiskOption = MagiskOption.ALL_ROOTS,
+            magiskCustomization = MagiskCustomization(
+                option = MagiskOption.ALL_ROOTS,
+                zygiskEnabled = true,
+                denyListEnabled = true,
+                systemlessHosts = true,
+                patchMode = MagiskPatchMode.FLASHABLE_ZIP,
+                rootAccess = MagiskRootAccess.APPS_AND_ADB,
+                randomizeStubPkg = true
+            ),
+            debloaterScript = true,
+            customKernelFlasher = true,
+            safeStrapHijack = true,
+            busyboxInjection = true,
+            microGInjection = true,
+            signatureSpoofing = true,
+            batterySaverProfile = true,
+            viper4AndroidFx = true,
+            zramSwapOptimizer = true,
+            adawaySystemlessHosts = true,
+            fDroidPrivilegedExt = true,
+            thermalMitigationTweak = true,
+            forceDexPreopt = true,
+            appOpsPrivacyManager = true,
+            dalvikHeapOptimizer = true
+        )
+
+        _buildConfig.value = _buildConfig.value.copy(
+            recovery = orangeFox,
+            os = hyperOs,
+            selectedVersion = latestVersion,
+            additionalFeatures = heavyFeatures
+        )
+
+        _userMessage.value = "Heaviest Ultimate ZIP preset loaded! (OrangeFox + HyperOS + All-in-One Root + All Mods)"
     }
 
     fun deleteBuild(build: BuildEntity) {

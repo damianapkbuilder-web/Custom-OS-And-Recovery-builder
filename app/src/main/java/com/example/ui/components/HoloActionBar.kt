@@ -49,6 +49,7 @@ fun HoloActionBar(
     isWifiConnected: Boolean = true,
     isWifiSimulated: Boolean = false,
     onToggleWifiSimulation: ((Boolean) -> Unit)? = null,
+    onApplyHeaviestPreset: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var showThemeMenu by remember { mutableStateOf(false) }
@@ -60,17 +61,18 @@ fun HoloActionBar(
             .background(colors.actionBarBackground)
             .testTag("holo_action_bar")
     ) {
+        // Row 1: Title and Theme dropdown
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 14.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Holo App branding icon + title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f, fill = false)
             ) {
                 // Classic Holo App Icon Box
                 Box(
@@ -95,75 +97,41 @@ fun HoloActionBar(
                     Text(
                         text = "Recovery & ROM Studio",
                         color = colors.actionBarText,
-                        fontSize = 17.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.3.sp
+                        letterSpacing = 0.2.sp,
+                        maxLines = 1
                     )
                     Text(
                         text = "Flashable Packaging & Downgrade Engine",
                         color = if (colors.isDark) Color(0xFF9E9E9E) else Color(0xFF666666),
-                        fontSize = 11.sp
+                        fontSize = 11.sp,
+                        maxLines = 1
                     )
                 }
             }
 
-            // Actions group
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Wi-Fi requirement status pill
-                Box(
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Theme selector action widget
+            Box {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clip(RoundedCornerShape(3.dp))
-                        .background(if (colors.isDark) Color(0xFF1A1A1A) else Color(0xFFE8E8E8))
-                        .border(
-                            1.dp,
-                            if (isWifiConnected) HoloBlueLight else com.example.ui.theme.HoloOrangeLight,
-                            RoundedCornerShape(3.dp)
-                        )
-                        .clickable {
-                            onToggleWifiSimulation?.invoke(!isWifiSimulated)
-                        }
-                        .padding(horizontal = 6.dp, vertical = 4.dp)
-                        .testTag("action_bar_wifi_status")
+                        .background(if (colors.isDark) Color(0xFF1E1E1E) else Color(0xFFDDDDDD))
+                        .border(1.dp, if (colors.isDark) Color(0xFF333333) else Color(0xFFCCCCCC), RoundedCornerShape(3.dp))
+                        .clickable { showThemeMenu = true }
+                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                        .testTag("theme_selector_dropdown_btn")
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (isWifiConnected) Icons.Default.Wifi else Icons.Default.WifiOff,
-                            contentDescription = if (isWifiConnected) "Wi-Fi Connected" else "Wi-Fi Disconnected",
-                            tint = if (isWifiConnected) HoloBlueLight else com.example.ui.theme.HoloOrangeLight,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (isWifiConnected) (if (isWifiSimulated) "Wi-Fi (Sim)" else "Wi-Fi") else "No Wi-Fi",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isWifiConnected) HoloBlueLight else com.example.ui.theme.HoloOrangeLight
-                        )
-                    }
-                }
-
-                // Theme selector action widget
-                Box {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(if (colors.isDark) Color(0xFF1E1E1E) else Color(0xFFDDDDDD))
-                            .border(1.dp, if (colors.isDark) Color(0xFF333333) else Color(0xFFCCCCCC), RoundedCornerShape(3.dp))
-                            .clickable { showThemeMenu = true }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                            .testTag("theme_selector_dropdown_btn")
-                    ) {
                     Icon(
                         imageVector = Icons.Default.ColorLens,
                         contentDescription = "Theme",
                         tint = HoloBlueLight,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(15.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = currentTheme.title,
                         fontSize = 11.sp,
@@ -174,7 +142,7 @@ fun HoloActionBar(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Expand",
                         tint = colors.actionBarText,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(15.dp)
                     )
                 }
 
@@ -213,7 +181,77 @@ fun HoloActionBar(
                 }
             }
         }
-    }
+
+        // Row 2: Heaviest Preset and Wi-Fi status quick toolbar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Heaviest ZIP Preset Quick Button
+            if (onApplyHeaviestPreset != null) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(Color(0xFFB71C1C))
+                        .border(1.dp, Color(0xFFFF5252), RoundedCornerShape(3.dp))
+                        .clickable { onApplyHeaviestPreset() }
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .testTag("heaviest_zip_action_btn")
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Build,
+                            contentDescription = "Heaviest ZIP",
+                            tint = Color.White,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = "HEAVIEST ZIP PRESET",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+
+            // Wi-Fi requirement status pill
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(if (colors.isDark) Color(0xFF1A1A1A) else Color(0xFFE8E8E8))
+                    .border(
+                        1.dp,
+                        if (isWifiConnected) HoloBlueLight else com.example.ui.theme.HoloOrangeLight,
+                        RoundedCornerShape(3.dp)
+                    )
+                    .clickable {
+                        onToggleWifiSimulation?.invoke(!isWifiSimulated)
+                    }
+                    .padding(horizontal = 8.dp, vertical = 5.dp)
+                    .testTag("action_bar_wifi_status")
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = if (isWifiConnected) Icons.Default.Wifi else Icons.Default.WifiOff,
+                        contentDescription = if (isWifiConnected) "Wi-Fi Connected" else "Wi-Fi Disconnected",
+                        tint = if (isWifiConnected) HoloBlueLight else com.example.ui.theme.HoloOrangeLight,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isWifiConnected) (if (isWifiSimulated) "Wi-Fi (Simulated)" else "Wi-Fi Connected") else "No Wi-Fi",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isWifiConnected) HoloBlueLight else com.example.ui.theme.HoloOrangeLight
+                    )
+                }
+            }
+        }
 
         // Signature Holo Action Bar bottom border (vibrant 2dp Holo Blue strip)
         Box(
