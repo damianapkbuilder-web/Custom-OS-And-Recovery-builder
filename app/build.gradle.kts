@@ -17,8 +17,8 @@ android {
     applicationId = "com.aistudio.recoveryrom.bldxz"
     minSdk = 24
     targetSdk = 36
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 80
+    versionName = "0.8.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
