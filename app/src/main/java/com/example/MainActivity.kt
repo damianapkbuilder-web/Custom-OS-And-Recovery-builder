@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.MainViewModel
 import com.example.ui.components.HoloActionBar
 import com.example.ui.screens.BatterySyncScreen
+import com.example.ui.screens.BinaryDownloaderScreen
 import com.example.ui.screens.BuilderScreen
 import com.example.ui.screens.DevToolsScreen
 import com.example.ui.screens.SavedBuildsScreen
@@ -54,10 +55,12 @@ import com.example.ui.theme.HoloBlueDark
 import com.example.ui.theme.HoloBlueLight
 import com.example.ui.theme.HoloOrangeLight
 import com.example.ui.theme.HoloTheme
+import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.DeveloperMode
 
 sealed class ScreenTab(val title: String, val icon: ImageVector, val tag: String) {
     data object Builder : ScreenTab("Builder", Icons.Default.Build, "nav_tab_builder")
+    data object Downloader : ScreenTab("Downloader", Icons.Default.CloudDownload, "nav_tab_downloader")
     data object Flashables : ScreenTab("Flashables", Icons.Default.FolderZip, "nav_tab_flashables")
     data object PowerSync : ScreenTab("Power & Sync", Icons.Default.BatteryChargingFull, "nav_tab_powersync")
     data object DevTools : ScreenTab("Dev Lab", Icons.Default.DeveloperMode, "nav_tab_devtools")
@@ -85,6 +88,7 @@ fun MainAppContent(viewModel: MainViewModel) {
     val tabs = remember {
         listOf(
             ScreenTab.Builder,
+            ScreenTab.Downloader,
             ScreenTab.Flashables,
             ScreenTab.PowerSync,
             ScreenTab.DevTools
@@ -187,9 +191,10 @@ fun MainAppContent(viewModel: MainViewModel) {
         ) {
             when (selectedTabIndex) {
                 0 -> BuilderScreen(viewModel = viewModel)
-                1 -> SavedBuildsScreen(viewModel = viewModel)
-                2 -> BatterySyncScreen(viewModel = viewModel)
-                3 -> DevToolsScreen(viewModel = viewModel)
+                1 -> BinaryDownloaderScreen()
+                2 -> SavedBuildsScreen(viewModel = viewModel)
+                3 -> BatterySyncScreen(viewModel = viewModel)
+                4 -> DevToolsScreen(viewModel = viewModel)
             }
         }
     }
