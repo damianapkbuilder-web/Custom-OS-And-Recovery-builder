@@ -139,16 +139,26 @@ dependencies {
   "ksp"(libs.moshi.kotlin.codegen)
 }
 
-tasks.register<Copy>("copyApkToFiles") {
-    val apkDir = File(layout.buildDirectory.get().asFile, "outputs/apk/debug")
-    from(apkDir)
-    into(File("/app/apk_files"))
-    include("*.apk")
+tasks.register("copyApkToFiles") {
+    val apkDir = layout.buildDirectory.dir("outputs/apk/debug")
+    inputs.dir(apkDir)
     doLast {
-        val srcApk = File(apkDir, "app-debug.apk")
-        val targetRenamed = File("/app/apk_files", "recovery_rom_builder.apk")
+        val srcApk = apkDir.get().file("app-debug.apk").asFile
         if (srcApk.exists()) {
-            srcApk.copyTo(targetRenamed, overwrite = true)
+            val destinationDirs = listOf(
+                File("/app/apk_files"),
+                File("/apk_build"),
+                File("apk_build"),
+                File("public")
+            )
+            destinationDirs.forEach { dir ->
+                try {
+                    dir.mkdirs()
+                    srcApk.copyTo(File(dir, "recovery_rom_builder_v0.8.0.apk"), overwrite = true)
+                    srcApk.copyTo(File(dir, "recovery_rom_builder.apk"), overwrite = true)
+                    srcApk.copyTo(File(dir, "app-debug.apk"), overwrite = true)
+                } catch (_: Exception) {}
+            }
         }
     }
 }
